@@ -40,11 +40,12 @@
 								<th>E-Mail</th>
 								<th>Telefone</th>
 								<th>CPF</th>
-
+							<!--
 								<th>Rua</th>
 								<th>Número</th>
 								<th>Cidade</th>
 								<th>CEP</th>
+							-->
 
 								<th>Cargo</th>
 								<th>Salário</th>
@@ -74,12 +75,12 @@
 										echo '<td>' . $funcionario['email'] . '</td>';
 										echo '<td>' . $funcionario['telefone'] . '</td>';
 										echo '<td>' . $funcionario['cpf'] . '</td>';
-
+										/*
 										echo '<td>' . $funcionario['rua'] . '</td>';
 										echo '<td>' . $funcionario['numero'] . '</td>';
 										echo '<td>' . $funcionario['cidade'] . '</td>';
 										echo '<td>' . $funcionario['cep'] . '</td>';
-
+										*/
 										echo '<td>' . $funcionario['cargo'] . '</td>';
 										echo '<td>' . $funcionario['salario'] . '</td>';
 										echo '<td>' . $funcionario['login'] . '</td>';

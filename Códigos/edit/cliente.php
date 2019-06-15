@@ -29,7 +29,7 @@
 				<div class="modal-content">
 					<form id="filial" name="filial" action="" method="POST" target="_self">
 						<div class="modal-header">
-							<h4 class="modal-title">Editar Filial</h4>
+							<h4 class="modal-title">Editar Cliente</h4>
 						</div>
 						<div class="modal-body">
 							<div class="form-group">

@@ -4,7 +4,7 @@
 	<?php
 		include("../header.php");
 	?>
-	<title>Adicionar Funcionário</title>
+	<title>Adicionar Gerente</title>
 </head>
 <body>
 	<div class="d-flex" id="wrapper">
@@ -17,9 +17,9 @@
 		<div id="add">
 			<div class="modal-dialog">
 				<div class="modal-content">
-					<form id="funcionario" name="funcionario" action="" method="POST" target="_self">
+					<form id="gerente" name="gerente" action="" method="POST" target="_self">
 						<div class="modal-header">
-							<h4 class="modal-title">Adicionar Funcionário</h4>
+							<h4 class="modal-title">Adicionar Gerente</h4>
 						</div>
 						<div class="modal-body">
 							<div class="form-group">
@@ -85,10 +85,34 @@
 								<label>Senha</label>
 								<input type="password" name="senha" id="senha" class="form-control" required></textarea>
 							</div>
+							<div class="form-group">
+								<label>Turno</label>
+								<select id="turno" name="turno" class="form-control">
+									<?php
+										$options = ['Integral', 'Diurno', 'Noturno'];
+
+										foreach ($options as $option){
+											echo "<option> $option </option>";
+										}
+									?>
+								</select>
+							</div>
+							<div class="form-group">
+								<label>Grau</label>
+								<select id="grau" name="grau" class="form-control">
+									<?php
+										$options = ['Diretoria', 'Intermediária', 'Operacional'];
+
+										foreach ($options as $option){
+											echo "<option> $option </option>";
+										}
+									?>
+								</select>
+							</div>
 							<input type="checkbox" name="status" value="1">Ativo<br>
 						</div>
 						<div class="modal-footer">
-							<a href="../funcionario.php"><span class="btn btn-default" value="Cancelar">Cancelar</span></a>
+							<a href="../gerente.php"><span class="btn btn-default" value="Cancelar">Cancelar</span></a>
 							<button type="submit" class="btn btn-success" value="Salvar" name="submit">Salvar</button>
 						</div>
 					</form>
@@ -114,6 +138,9 @@
 			$salario 	= $_POST['salario'];
 			$login 		= $_POST['login'];
 			$senha 		= $_POST['senha'];
+
+			$turno 		= $_POST['turno'];
+			$grau 		= $_POST['grau'];
 
 			$nome_filial = $_POST['nome_filial'];
 
@@ -141,9 +168,13 @@
 					VALUES ('$cargo', '$salario', '$login', '$senha', '$status', '$id_filial', '$id_pessoa')";
 			$resultado = mysqli_query($conexao, $sql);
 
+			$sql = "INSERT INTO gerente (turno, grau, id_pessoa) 
+					VALUES ('$turno', '$grau', '$id_pessoa')";
+			$resultado = mysqli_query($conexao, $sql);
+
 			mysqli_close($conexao);
 
-			header("Location: ../funcionario.php"); // redireciona de volta para a página de vizualização
+			header("Location: ../gerente.php"); // redireciona de volta para a página de vizualização
 		}
 	?>
 

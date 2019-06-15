@@ -8,15 +8,19 @@ import random, rstr, datetime, string
 
 NUM_INSERTS	= 50
 
-PROP_FILIAL	 		= 0.1
-PROP_CLIENTE		= 0.6
-PROP_FUNCIONARIO	= 0.35
+# PROP: Filial, Evento
+PROP	 			= 0.2
+
+PROP_CLIENTE		= 0.2
+PROP_FUNCIONARIO	= 0.2
 PROP_GERENTE		= 0.05
 
-NUM_FILIAL 		= int(NUM_INSERTS * PROP_FILIAL)
+NUM_OUTROS 		= int(NUM_INSERTS * PROP)
 NUM_CLIENTE 	= int(NUM_INSERTS * PROP_CLIENTE)
 NUM_FUNCIONARIO = int(NUM_INSERTS * PROP_FUNCIONARIO)
 NUM_GERENTE 	= int(NUM_INSERTS * PROP_GERENTE)
+
+NUM_CONVIDADO	= 10
 
 def gen_age():
 	return random.randint(15, 99)
@@ -26,7 +30,7 @@ def gen_boolean():
 
 def gen_foreing_key(type):
 	if(type == 'filial'):
-		return random.randint(1, NUM_FILIAL)
+		return random.randint(1, NUM_OUTROS)
 	elif(type == 'cliente'):
 		return random.randint(1, NUM_CLIENTE)
 	elif(type == 'funcionario'):
@@ -59,6 +63,7 @@ def gen_salary():
 def gen_credit():
 	return '{0}.00'.format(rstr.rstr('1234567890', 3))
 
+'''
 def gen_timestamp():
 	year 		= random.randint(1980, 2018)
 	month 		= random.randint(1, 12)
@@ -69,6 +74,24 @@ def gen_timestamp():
 	#microsecond = random.randint(0, 999999)
 
 	date = datetime.datetime(year, month, day, hour, minute, second).isoformat(" ")
+	return date
+'''
+
+def gen_duration():
+	hour 		= random.randint(2, 5)
+	minute 		= random.choice([0, 15, 30, 45])
+	second		= 0
+
+	return str(hour)+':'+str(minute)+':'+str(second)
+
+def gen_date():
+	year 		= random.randint(1980, 2018)
+	month 		= random.randint(1, 12)
+	day 		= random.randint(1, 28)
+	hour 		= random.randint(12, 20)
+	minute 		= random.choice([0, 15, 30, 45])
+
+	date = datetime.datetime(year, month, day, hour, minute).isoformat(" ")
 	return date
 
 def gen_city():
@@ -83,7 +106,7 @@ def gen_city():
 	return random.choice(list_city)[0] #Retorna apenas a Cidade
 
 def gen_letters_uppercase():
-	letters = string.ascii_uppercase[:20]
+	letters = string.ascii_uppercase[:25]
 	return random.choice(letters)
 
 def gen_letters_lowercase():
@@ -117,6 +140,12 @@ def gen_job():
 		'Manobrista'
 	]
 	return random.choice(list_job)
+
+def gen_gerencia():
+	list_gerencia = [
+		'Diretoria', 'Intermediária', 'Operacional'
+	]
+	return random.choice(list_gerencia)
 
 def gen_email():
 	domains = [ 'hotmail.com', 'gmail.com', 'ice.ufjf.br', 'yahoo.com']
@@ -155,21 +184,51 @@ with open('lanchonete_script.sql', 'r') as file:
 		cursor.execute(line)
 		conn.commit()
 
+sql = "SET FOREIGN_KEY_CHECKS=0"
+cursor.execute(sql)
+conn.commit()
+
 for i in range(NUM_INSERTS):
 	rua 		= gen_street()
 	numero 		= gen_number()
 	cidade 		= gen_city()
 	cep 		= gen_cep()
 
-	if(i < NUM_FILIAL):
+	if(i < NUM_OUTROS):
 		nome = gen_letters_uppercase()
 
 		sql 	= "INSERT INTO filial (nome, rua, numero, cidade, cep) VALUES (%s, %s, %s, %s, %s)"
 		values 	= (nome, rua, numero, cidade, cep)
 
 		cursor.execute(sql, values)
+		conn.commit()
 
-	elif(i < NUM_FILIAL + NUM_CLIENTE + NUM_FUNCIONARIO + NUM_GERENTE):
+		data = gen_date()
+		duracao = gen_duration()
+		preco = gen_salary()
+		id_filial = gen_foreing_key('filial')
+		id_cliente = gen_foreing_key('cliente')
+
+		sql 	= "INSERT INTO evento (data, duracao, preco, id_filial, id_cliente) VALUES (%s, %s, %s, %s, %s)"
+		values 	= (data, duracao, preco, id_filial, id_cliente)
+
+		cursor.execute(sql, values)
+		conn.commit()
+
+		id_evento = cursor.lastrowid
+
+		for aux in range(NUM_CONVIDADO):
+			nome = gen_name()+' '+gen_letters_uppercase()+'.'+' '+gen_letters_uppercase()+'.'
+
+			sql 	= "INSERT INTO convidado (nome, id_evento) VALUES (%s, %s)"
+			values 	= (nome, id_evento)
+
+			cursor.execute(sql, values)
+			conn.commit()
+
+
+
+	elif(i < NUM_OUTROS + NUM_CLIENTE + NUM_FUNCIONARIO + NUM_GERENTE):
 		nome 		= gen_name()
 		email 		= gen_email()
 		telefone 	= gen_phone()
@@ -183,7 +242,7 @@ for i in range(NUM_INSERTS):
 
 		id_pessoa = cursor.lastrowid
 
-		if(i < NUM_FILIAL + NUM_CLIENTE):
+		if(i < NUM_OUTROS + NUM_CLIENTE):
 			credito_disponivel = gen_credit()
 
 			sql 	= "INSERT INTO cliente (credito_disponivel, id_pessoa) VALUES (%s, %s)"
@@ -207,9 +266,12 @@ for i in range(NUM_INSERTS):
 			cursor.execute(sql, values)
 			conn.commit()
 
-			if(i < NUM_FILIAL + NUM_CLIENTE + NUM_FUNCIONARIO + NUM_GERENTE):
+			aux_1 = NUM_OUTROS + NUM_CLIENTE + NUM_FUNCIONARIO
+			aux_2 = NUM_OUTROS + NUM_CLIENTE + NUM_FUNCIONARIO + NUM_GERENTE
+
+			if(aux_1 <= i and i < aux_2):
 				turno 	= gen_shift()
-				grau 	= gen_boolean()
+				grau 	= gen_gerencia()
 
 				sql 	= "INSERT INTO gerente (turno, grau, id_pessoa) VALUES (%s, %s, %s)"
 				values 	= (turno, grau, id_pessoa)
@@ -217,6 +279,9 @@ for i in range(NUM_INSERTS):
 				cursor.execute(sql, values)
 				conn.commit()
 
+sql = "SET FOREIGN_KEY_CHECKS=1"
+cursor.execute(sql)
+conn.commit()
 
 '''
 sql = "SELECT * FROM filial"
