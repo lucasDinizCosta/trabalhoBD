@@ -4,7 +4,7 @@
 	<?php
 		include("../header.php");
 	?>
-	<title>Editar Funcionário</title>
+	<title>Editar Evento</title>
 </head>
 <body>
 	<div class="d-flex" id="wrapper">
@@ -35,7 +35,7 @@
 				<div class="modal-content">
 					<form id="filial" name="filial" action="" method="POST" target="_self">
 						<div class="modal-header">
-							<h4 class="modal-title">Editar Cliente</h4>
+							<h4 class="modal-title">Editar Evento</h4>
 						</div>
 						<div class="modal-body">
 							<div class="form-group">

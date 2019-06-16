@@ -4,7 +4,7 @@
 	<?php
 		include("../header.php");
 	?>
-	<title>Editar Funcionário</title>
+	<title>Editar Cliente</title>
 </head>
 <body>
 	<div class="d-flex" id="wrapper">
@@ -93,8 +93,6 @@
 			$cep 		= $_POST['cep'];
 
 			$credito_disponivel = $_POST['credito_disponivel'];
-
-			$nome_filial = $_POST['nome_filial'];
 
 			$sql = "UPDATE pessoa 
 					SET nome='$nome', email='$email', telefone='$telefone', cpf='$cpf', rua='$rua', numero='$numero', cidade='$cidade', cep='$cep'

@@ -8,7 +8,7 @@ import random, rstr, datetime, string
 
 NUM_INSERTS	= 50
 
-# PROP: Filial, Evento
+# PROP: Filial, Evento, Fornecedor, Depósito
 PROP	 			= 0.2
 
 PROP_CLIENTE		= 0.2
@@ -29,7 +29,11 @@ def gen_boolean():
 	return random.randint(0, 1)
 
 def gen_foreing_key(type):
-	if(type == 'filial'):
+	if(type == 'deposito'):
+		return random.randint(1, NUM_OUTROS)
+	elif(type == 'filial'):
+		return random.randint(1, NUM_OUTROS)
+	elif(type == 'fornecedor'):
 		return random.randint(1, NUM_OUTROS)
 	elif(type == 'cliente'):
 		return random.randint(1, NUM_CLIENTE)
@@ -37,6 +41,12 @@ def gen_foreing_key(type):
 		return random.randint(NUM_CLIENTE+1, NUM_CLIENTE+NUM_FUNCIONARIO)
 	elif(type == 'gerente'):
 		return random.randint(NUM_FUNCIONARIO+NUM_CLIENTE+1, NUM_FUNCIONARIO+NUM_CLIENTE+NUM_GERENTE)
+
+def gen_cnpj():
+	return '{0}.{1}.{2}/0001-{3}'.format(rstr.rstr('1234567890', 2),
+										 rstr.rstr('1234567890', 3),
+										 rstr.rstr('1234567890', 3),
+										 rstr.rstr('1234567890', 2))
 
 def gen_cpf():
 	return '{0}.{1}.{2}-{3}'.format(rstr.rstr('1234567890', 3),
@@ -189,12 +199,15 @@ cursor.execute(sql)
 conn.commit()
 
 for i in range(NUM_INSERTS):
-	rua 		= gen_street()
-	numero 		= gen_number()
-	cidade 		= gen_city()
-	cep 		= gen_cep()
+	rua 	= gen_street()
+	numero 	= gen_number()
+	cidade 	= gen_city()
+	cep 	= gen_cep()
 
 	if(i < NUM_OUTROS):
+
+		#-----------------------------------FILIAL---------------------------------------
+
 		nome = gen_letters_uppercase()
 
 		sql 	= "INSERT INTO filial (nome, rua, numero, cidade, cep) VALUES (%s, %s, %s, %s, %s)"
@@ -202,6 +215,8 @@ for i in range(NUM_INSERTS):
 
 		cursor.execute(sql, values)
 		conn.commit()
+
+		#-----------------------------------EVENTO---------------------------------------
 
 		data = gen_date()
 		duracao = gen_duration()
@@ -217,6 +232,8 @@ for i in range(NUM_INSERTS):
 
 		id_evento = cursor.lastrowid
 
+		#----------------------------------CONVIDADO-------------------------------------
+
 		for aux in range(NUM_CONVIDADO):
 			nome = gen_name()+' '+gen_letters_uppercase()+'.'+' '+gen_letters_uppercase()+'.'
 
@@ -226,9 +243,39 @@ for i in range(NUM_INSERTS):
 			cursor.execute(sql, values)
 			conn.commit()
 
+		#----------------------------------FORNECEDOR------------------------------------
 
+		razao_social 	= gen_name()
+		cnpj 			= gen_cnpj()
+
+		rua 			= gen_street()
+		numero 			= gen_number()
+		cidade 			= gen_city()
+		cep 			= gen_cep()
+
+		sql 	= "INSERT INTO fornecedor (razao_social, cnpj, rua, numero, cidade, cep) VALUES (%s, %s, %s, %s, %s, %s)"
+		values 	= (razao_social, cnpj, rua, numero, cidade, cep)
+
+		cursor.execute(sql, values)
+		conn.commit()
+
+		#----------------------------------DEPOSITO-------------------------------------
+
+		rua 			= gen_street()
+		numero 			= gen_number()
+		cidade 			= gen_city()
+		cep 			= gen_cep()
+
+		sql 	= "INSERT INTO deposito (rua, numero, cidade, cep) VALUES (%s, %s, %s, %s)"
+		values 	= (rua, numero, cidade, cep)
+
+		cursor.execute(sql, values)
+		conn.commit()
 
 	elif(i < NUM_OUTROS + NUM_CLIENTE + NUM_FUNCIONARIO + NUM_GERENTE):
+
+		#-----------------------------------PESSOA--------------------------------------
+
 		nome 		= gen_name()
 		email 		= gen_email()
 		telefone 	= gen_phone()
@@ -243,6 +290,9 @@ for i in range(NUM_INSERTS):
 		id_pessoa = cursor.lastrowid
 
 		if(i < NUM_OUTROS + NUM_CLIENTE):
+
+			#--------------------------------CLIENTE-----------------------------------
+
 			credito_disponivel = gen_credit()
 
 			sql 	= "INSERT INTO cliente (credito_disponivel, id_pessoa) VALUES (%s, %s)"
@@ -252,6 +302,9 @@ for i in range(NUM_INSERTS):
 			conn.commit()
 
 		else:
+
+			#------------------------------FUNCIONARIO---------------------------------
+
 			cargo		= gen_job()
 			salario		= gen_salary()
 			login		= gen_letters_lowercase()
@@ -259,12 +312,13 @@ for i in range(NUM_INSERTS):
 			status		= gen_boolean()
 			id_filial	= gen_foreing_key('filial')
 
-
 			sql 	= "INSERT INTO funcionario (cargo, salario, login, senha, status, id_filial, id_pessoa) VALUES (%s, %s, %s, %s, %s, %s, %s)"
 			values 	= (cargo, salario, login, senha, status, id_filial, id_pessoa)
 
 			cursor.execute(sql, values)
 			conn.commit()
+
+			#--------------------------------GERENTE-----------------------------------
 
 			aux_1 = NUM_OUTROS + NUM_CLIENTE + NUM_FUNCIONARIO
 			aux_2 = NUM_OUTROS + NUM_CLIENTE + NUM_FUNCIONARIO + NUM_GERENTE
@@ -278,6 +332,7 @@ for i in range(NUM_INSERTS):
 
 				cursor.execute(sql, values)
 				conn.commit()
+				
 
 sql = "SET FOREIGN_KEY_CHECKS=1"
 cursor.execute(sql)

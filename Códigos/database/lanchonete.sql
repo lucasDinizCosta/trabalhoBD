@@ -64,3 +64,21 @@ CREATE TABLE convidado (
 	PRIMARY KEY(nome, id_evento),
 	FOREIGN KEY(id_evento) REFERENCES evento (id_evento)
 );
+
+CREATE TABLE fornecedor (
+	rua 			VARCHAR(200),
+	cep 			CHAR(9),
+	numero 			INTEGER,
+	cidade 			VARCHAR(200),
+	razao_social 	VARCHAR(200),
+	cnpj 			VARCHAR(18),
+	id_fornecedor 	INTEGER PRIMARY KEY 	AUTO_INCREMENT
+);
+
+CREATE TABLE deposito (
+	cidade 			VARCHAR(200),
+	numero 			INTEGER,
+	cep 			CHAR(9),
+	rua 			VARCHAR(200),
+	id_deposito 	INTEGER PRIMARY KEY 	AUTO_INCREMENT
+);
