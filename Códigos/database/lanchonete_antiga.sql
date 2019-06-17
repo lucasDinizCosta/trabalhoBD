@@ -23,6 +23,9 @@ DROP TABLE IF EXISTS `pessoa`;
 DROP TABLE IF EXISTS `deposito`;
 DROP TABLE IF EXISTS `filial`;
 
+DROP DATABASE IF EXISTS lanchonete;
+CREATE DATABASE lanchonete;
+
 CREATE TABLE filial (
 	nome 		VARCHAR(200)	NOT NULL,
 	cep 		VARCHAR(9)		NOT NULL,

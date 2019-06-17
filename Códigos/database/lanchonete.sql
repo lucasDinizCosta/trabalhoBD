@@ -82,3 +82,70 @@ CREATE TABLE deposito (
 	rua 			VARCHAR(200),
 	id_deposito 	INTEGER PRIMARY KEY 	AUTO_INCREMENT
 );
+
+CREATE TABLE ingrediente (
+	nome 			VARCHAR(200),
+	preco_unitario 	NUMERIC(10,2),
+	id_ingrediente 	INTEGER PRIMARY KEY 	AUTO_INCREMENT
+);
+
+CREATE TABLE produto (
+	nome 		VARCHAR(200),
+	preco 		NUMERIC(10,2),
+	id_produto 	INTEGER PRIMARY KEY 	AUTO_INCREMENT
+);
+
+CREATE TABLE combo (
+	preco 		NUMERIC(10,2),
+	nome 		VARCHAR(200),
+	id_combo 	INTEGER PRIMARY KEY 	AUTO_INCREMENT
+);
+
+CREATE TABLE deposito_filial (
+	id_filial 	INTEGER,
+	id_deposito INTEGER,
+	PRIMARY KEY(id_filial, id_deposito),
+	FOREIGN KEY(id_filial) 	 REFERENCES filial   (id_filial),
+	FOREIGN KEY(id_deposito) REFERENCES deposito (id_deposito)
+);
+
+CREATE TABLE item_ingrediente_deposito (
+	id_deposito 	INTEGER,
+	id_ingrediente 	INTEGER,
+	PRIMARY KEY(id_deposito, id_ingrediente),
+	FOREIGN KEY(id_deposito) 	REFERENCES deposito    (id_deposito),
+	FOREIGN KEY(id_ingrediente) REFERENCES ingrediente (id_ingrediente)
+);
+
+CREATE TABLE item_ingrediente_fornecedor (
+	id_fornecedor 	INTEGER,
+	id_ingrediente 	INTEGER,
+	PRIMARY KEY(id_fornecedor, id_ingrediente),
+	FOREIGN KEY(id_fornecedor) 	REFERENCES fornecedor  (id_fornecedor),
+	FOREIGN KEY(id_ingrediente) REFERENCES ingrediente (id_ingrediente)
+);
+
+CREATE TABLE item_produto_deposito (
+	id_deposito 	INTEGER,
+	id_produto 		INTEGER,
+	PRIMARY KEY(id_deposito, id_produto),
+	FOREIGN KEY(id_deposito) REFERENCES deposito (id_deposito),
+	FOREIGN KEY(id_produto)  REFERENCES produto  (id_produto)
+);
+
+CREATE TABLE item_ingrediente_produto (
+	quantidade 		INTEGER,
+	id_ingrediente 	INTEGER,
+	id_produto 		INTEGER,
+	PRIMARY KEY(id_ingrediente, id_produto),
+	FOREIGN KEY(id_ingrediente) REFERENCES ingrediente (id_ingrediente),
+	FOREIGN KEY(id_produto) 	REFERENCES produto 	   (id_produto)
+);
+
+CREATE TABLE item_produto_fornecedor (
+	id_fornecedor 	INTEGER,
+	id_produto 		INTEGER,
+	PRIMARY KEY(id_fornecedor, id_produto),
+	FOREIGN KEY(id_fornecedor) 	REFERENCES fornecedor (id_fornecedor),
+	FOREIGN KEY(id_produto) 	REFERENCES produto 	  (id_produto)
+);
