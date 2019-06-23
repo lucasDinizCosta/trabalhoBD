@@ -1,6 +1,3 @@
--- Possíveis Problemas:
------- Uma pessoa pode ser funcionário e cliente ao mesmo tempo
-
 
 
 ----------------------------------------------------------- Funciona -----------------------------------------------------------
@@ -265,184 +262,114 @@ DELETE FROM combo WHERE id_combo=20;
 
 
 
+INSERT INTO item_produto_combo (id_produto, id_combo) VALUES
+(1, 1),
+(1, 2),
+(1, 3),
+(2, 1),
+(2, 2),
+(2, 3),
+(3, 1),
+(3, 2),
+(3, 3);
 
+DELETE FROM item_produto_combo WHERE id_combo=3;
+
+
+
+
+INSERT INTO venda (data, nota_fiscal, id_cliente, id_funcionario, id_venda) VALUES
+('1980-09-16 19:15:00', '12345678910', 1, 2, 10),
+('1980-09-16 19:25:00', '12345678911', 1, 3, 2),
+('1980-09-16 19:35:00', '12345678912', 1, 2, 20),
+('1980-09-16 19:45:00', '12345678913', 1, 3, 3);
+
+UPDATE	venda SET	id_venda=1 WHERE 	id_venda=10;
+
+DELETE FROM venda WHERE id_venda=20;
+
+
+
+INSERT INTO entrega (rua, cep, numero, cidade, frete, nome_destinatario, id_venda) VALUES
+('Rua 1', '11111-111', '111', 'Campo Grande', '1.0', 'Mariana Costa', 1),
+('Rua 1', '11111-111', '111', 'Campo Grande', '5.5', 'Mariana Costa', 2),
+('Rua 1', '11111-111', '111', 'Campo Grande', '5.5', 'Mariana Costa', 3);
+
+
+
+
+INSERT INTO item_produto_venda (preco_unitario, quantidade, id_produto, id_venda) VALUES
+('1.50', 1, 1, 1),
+('1.50', 2, 1, 2),
+('1.50', 3, 1, 3),
+('2.50', 1, 2, 1),
+('2.50', 2, 2, 2),
+('2.50', 3, 2, 3),
+('3.50', 1, 3, 1),
+('3.50', 2, 3, 2),
+('3.50', 3, 3, 3);
+
+DELETE FROM item_produto_venda WHERE id_venda=3;
+
+
+
+
+INSERT INTO item_combo_venda (preco_unitario, quantidade, id_combo, id_venda) VALUES
+('1.50', 1, 1, 1),
+('1.50', 2, 1, 2),
+('1.50', 3, 1, 3),
+('2.50', 1, 2, 1),
+('2.50', 2, 2, 2),
+('2.50', 3, 2, 3),
+('3.50', 1, 3, 1),
+('3.50', 2, 3, 2),
+('3.50', 3, 3, 3);
+
+DELETE FROM item_combo_venda WHERE id_venda=3;
 
 
 ----------------------------------------------------------- Não Funciona -----------------------------------------------------------
 
 
-
+-- VALIDAÇÃO PARA (1, N)
 
 -- Chave primária (id_filial) repetida 
 INSERT INTO filial (nome, cep, cidade, numero, rua, id_filial) VALUES
 ('2', '22222-222', 'Rio de Janeiro', 2, 'Rua 2', 1);
 
--- Chave primária (id_filial) está sendo usada como chave estrangeira 
-UPDATE	filial 	
-SET		id_filial=99	
-WHERE	id_filial=1
-
--- Chave primária (id_filial) está sendo usada como chave estrangeira 
-DELETE FROM filial WHERE id_filial=1
-
-
-
-
--- Chave primária (id_pessoa) repetida 
-INSERT INTO pessoa (cidade, cep, numero, rua, cpf, telefone, email, nome, id_pessoa) VALUES
-('Campo Grande', '33333-333', 333, 'Rua 3', '333.333.333-33', '33 3333-3333', 'teste3@teste.com', 'Isis Ribeiro', 2);
-
--- Chave primária (id_pessoa) já existe
-UPDATE	pessoa
-SET 	id_pessoa=2
-WHERE 	id_pessoa=1
-
--- Chave primária (id_pessoa) está sendo usada como chave estrangeira 
-UPDATE	pessoa
-SET 	id_pessoa=99
-WHERE 	id_pessoa=1
-
--- Chave primária (id_pessoa) está sendo usada como chave estrangeira 
-DELETE FROM pessoa WHERE id_pessoa=1
-
-
-
-
--- Chave primária estrangeira (id_pessoa) repetida 
-INSERT INTO cliente (credito_disponivel, id_pessoa) VALUES
-('123.12', 1);
-
--- Chave primária estrangeira (id_pessoa) está sendo usada como chave estrangeira
-UPDATE	cliente
-SET 	id_pessoa=2
-WHERE 	id_pessoa=1
-
--- Chave primária estrangeira (id_pessoa) está sendo usada como chave estrangeira 
-DELETE FROM cliente WHERE id_pessoa=1
-
-
-
-
--- Chave primária (id_pessoa) repetida 
-INSERT INTO funcionario (cargo, salario, login, senha, status, id_filial, id_pessoa) VALUES
-('Gerente',   '22222.22', 'teste2', 'senha2', 1, 1, 3);
-
 -- Chave estrangeira (id_filial) não existe
 INSERT INTO funcionario (cargo, salario, login, senha, status, id_filial, id_pessoa) VALUES
 ('Gerente',   '22222.22', 'teste2', 'senha2', 1, 99, 4);
-
--- Chave primária estrangeira (id_pessoa) está sendo usada como chave estrangeira
-UPDATE	funcionario
-SET 	id_pessoa=2
-WHERE 	id_pessoa=3
-
--- Chave primária estrangeira (id_pessoa) está sendo usada como chave estrangeira 
-DELETE FROM funcionario WHERE id_pessoa=3
-
-
-
 
 -- Chave primária e estrangeira (id_pessoa) não é um funcionário
 INSERT INTO gerente (turno, grau, id_pessoa) VALUES
 ('Integral', 'Intermediária', 1);
 
--- Chave primária estrangeira (id_pessoa) está sendo usada como chave estrangeira 
+-- Chave primária (id_filial) está sendo usada como chave estrangeira 
+UPDATE	filial
+SET		id_filial=99
+WHERE	id_filial=1
+
+-- Chave estrangeira (id_pessoa) não existe
+UPDATE	funcionario
+SET		id_pessoa=99
+WHERE	id_pessoa=1
+
+-- Chave primária e estrangeira (id_pessoa) não é um funcionário
 UPDATE	gerente
-SET 	id_pessoa=1
-WHERE 	id_pessoa=3
+SET		id_pessoa=1
+WHERE	id_pessoa=3
 
--- Chave primária estrangeira (id_pessoa) está sendo usada como chave estrangeira 
--- DELETE FROM gerente WHERE id_pessoa=3 -- Gerente não está vinculado a nenhuma chave estrangeira ainda
+-- Chave primária (id_filial) está sendo usada como chave estrangeira 
+DELETE FROM filial WHERE id_filial=1
 
-
-
-
--- Chave primária (id_evento) repetida 
-INSERT INTO evento (data, duracao, preco, id_filial, id_cliente, id_evento) VALUES
-('2008-03-05 13:15:00', '02:15:00', '36499.48', 1, 1, 2);
-
--- Chave estrangeira (id_cliente) não existe
-INSERT INTO evento (data, duracao, preco, id_filial, id_cliente, id_evento) VALUES
-('2008-03-05 13:15:00', '02:15:00', '36499.48', 1, 99, 3);
-
--- Chave estrangeira (id_filial) não existe
-INSERT INTO evento (data, duracao, preco, id_filial, id_cliente, id_evento) VALUES
-('1980-09-16 19:15:00', '02:00:00', '44499.37', 99, 1, 3);
-
--- Chave primária (id_evento) está sendo usada como chave estrangeira 
-UPDATE	evento
-SET 	id_evento=3
-WHERE 	id_evento=2
-
--- Chave primária (id_evento) está sendo usada como chave estrangeira 
-DELETE FROM evento WHERE id_evento=1
+-- Chave estrangeira (id_pessoa) não existe
+DELETE FROM funcionario WHERE id_pessoa=99
 
 
 
 
--- Chave primária (nome, id_evento) repetida 
-INSERT INTO convidado (nome, id_evento) VALUES
-('1', 1);
-
--- Chave primária (id_evento) não existe 
-INSERT INTO convidado (nome, id_evento) VALUES
-('1', 99);
-
--- Chave primária estrangeira (id_evento) não existe
-UPDATE	convidado
-SET 	id_evento=3
-WHERE 	id_evento=99
-
--- Chave primária estrangeira (id_evento) está sendo usada como chave estrangeira 
--- DELETE FROM convidado WHERE id_evento=2 -- Convidado não está vinculado a nenhuma chave estrangeira ainda
-
-
-
-
--- Chave primária (id_fornecedor) repetida 
-INSERT INTO fornecedor (rua, cep, numero, cidade, razao_social, cnpj, id_fornecedor) VALUES
-('Rua 2', '22222-222', 222, 'Campo Grande', 'Mariana Costa', '22.222.222/0001-22', 1);
-
--- Chave primária (id_evento) está sendo usada como chave estrangeira 
--- UPDATE	fornecedor
--- SET 	id_fornecedor=2
--- WHERE 	id_fornecedor=1 -- Fornecedor não está vinculado a nenhuma chave estrangeira ainda
-
--- Chave primária (id_evento) está sendo usada como chave estrangeira 
--- DELETE FROM fornecedor WHERE id_fornecedor=1 -- Fornecedor não está vinculado a nenhuma chave estrangeira ainda
-
-
-
-
--- Chave primária (id_deposito) repetida 
-INSERT INTO deposito (cidade, numero, cep, rua, id_deposito) VALUES
-('Juiz de Fora', 222, '22222-222', 'Rua 1', 1);
-
--- Chave primária (id_evento) está sendo usada como chave estrangeira 
-UPDATE	deposito
-SET 	id_deposito=2
-WHERE 	id_deposito=1
-
--- Chave primária (id_deposito) está sendo usada como chave estrangeira 
-DELETE FROM deposito WHERE id_deposito=1
-
-
-
-
--- Chave primária (id_ingrediente) repetida 
-INSERT INTO ingrediente (nome, preco_unitario, id_ingrediente) VALUES
-('Carne', '3.0', 1);
-
--- Chave primária (id_ingrediente) está sendo usada como chave estrangeira 
-UPDATE	ingrediente
-SET 	id_ingrediente=2
-WHERE 	id_ingrediente=1
-
--- Chave primária (id_ingrediente) está sendo usada como chave estrangeira 
-DELETE FROM ingrediente WHERE id_ingrediente=1
-
-
-
+-- VALIDAÇÃO PARA (N, N)
 
 -- Chave primária (id_filial, id_deposito) repetida 
 INSERT INTO deposito_filial (id_filial, id_deposito) VALUES
@@ -456,112 +383,27 @@ INSERT INTO deposito_filial (id_filial, id_deposito) VALUES
 INSERT INTO deposito_filial (id_filial, id_deposito) VALUES
 (1, 99);
 
+-- Chave estrangeira (id_filial) não existe
+UPDATE	deposito_filial
+SET		id_filial=99
+WHERE	id_filial=1
 
+-- Chave estrangeira (id_deposito) não existe
+UPDATE	deposito_filial
+SET		id_deposito=99
+WHERE	id_deposito=1
 
+-- Chave estrangeira (id_filial) repetida
+UPDATE	deposito_filial
+SET		id_filial=2
+WHERE	id_filial=1
 
--- Chave primária (id_deposito, id_ingrediente) repetida 
-INSERT INTO item_ingrediente_deposito (id_deposito, id_ingrediente) VALUES
-(1, 1);
+-- Chave estrangeira (id_deposito) repetida
+UPDATE	deposito_filial
+SET		id_deposito=2
+WHERE	id_deposito=1
 
--- Chave primaria estrangeira (id_deposito) não existe
-INSERT INTO item_ingrediente_deposito (id_deposito, id_ingrediente) VALUES
-(99, 1);
-
--- Chave primaria estrangeira (id_ingrediente) não existe
-INSERT INTO item_ingrediente_deposito (id_deposito, id_ingrediente) VALUES
-(1, 99);
-
-
-
-
--- Chave primária (id_fornecedor, id_ingrediente) repetida 
-INSERT INTO item_ingrediente_fornecedor (id_fornecedor, id_ingrediente) VALUES
-(1, 1);
-
--- Chave primaria estrangeira (id_fornecedor) não existe
-INSERT INTO item_ingrediente_fornecedor (id_fornecedor, id_ingrediente) VALUES
-(99, 1);
-
--- Chave primaria estrangeira (id_ingrediente) não existe
-INSERT INTO item_ingrediente_fornecedor (id_fornecedor, id_ingrediente) VALUES
-(1, 99);
-
-
-
-
--- Chave primária (id_produto) repetida 
-INSERT INTO produto (nome, preco, id_produto) VALUES
-('Carne', '3.0', 1);
-
--- Chave primária (id_produto) está sendo usada como chave estrangeira 
-UPDATE	produto
-SET 	id_produto=2
-WHERE 	id_produto=1
-
--- Chave primária (id_produto) está sendo usada como chave estrangeira 
-DELETE FROM produto WHERE id_produto=1
-
-
-
-
--- Chave primária (id_produto, id_deposito) repetida 
-INSERT INTO item_produto_deposito (id_produto, id_deposito) VALUES
-(1, 1);
-
--- Chave primaria estrangeira (id_produto) não existe
-INSERT INTO item_produto_deposito (id_produto, id_deposito) VALUES
-(99, 1);
-
--- Chave primaria estrangeira (id_deposito) não existe
-INSERT INTO item_produto_deposito (id_produto, id_deposito) VALUES
-(1, 99);
-
-
-
-
--- Chave primária (id_ingrediente, id_produto) repetida 
-INSERT INTO item_ingrediente_produto (quantidade, id_ingrediente, id_produto) VALUES
-(50, 1, 1);
-
--- Chave primaria estrangeira (id_ingrediente) não existe
-INSERT INTO item_ingrediente_produto (quantidade, id_ingrediente, id_produto) VALUES
-(40, 99, 1);
-
--- Chave primaria estrangeira (id_produto) não existe
-INSERT INTO item_ingrediente_produto (quantidade, id_ingrediente, id_produto) VALUES
-(30, 1, 99);
-
-
-
-
--- Chave primária (id_produto, id_fornecedor) repetida 
-INSERT INTO item_produto_fornecedor (id_produto, id_fornecedor) VALUES
-(1, 1);
-
--- Chave primaria estrangeira (id_produto) não existe
-INSERT INTO item_produto_fornecedor (id_produto, id_fornecedor) VALUES
-(99, 1);
-
--- Chave primaria estrangeira (id_fornecedor) não existe
-INSERT INTO item_produto_fornecedor (id_produto, id_fornecedor) VALUES
-(1, 99);
-
-
-
-
--- Chave primária (id_combo) repetida 
-INSERT INTO combo (nome, preco, id_combo) VALUES
-('Carne', '3.0', 1);
-
--- Chave primária (id_combo) está sendo usada como chave estrangeira 
-UPDATE	combo
-SET 	id_combo=2
-WHERE 	id_combo=1
-
--- Chave primária (id_combo) está sendo usada como chave estrangeira 
-DELETE FROM combo WHERE id_combo=1
-
-
-
+-- O Comando DELETE funciona pois a chave primária da tabela deposito_filial 
+--		não está usada como chave estrangeira em outra tabela
 
 

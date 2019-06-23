@@ -6,15 +6,15 @@ from mysql.connector import Error
 
 import random, rstr, datetime, string
 
-NUM_INSERTS	= 50
+NUM_INSERTS	= 200
 
-# PROP: Filial, Evento, Fornecedor, Depósito, Ingrediente, Produto, Combo
+# PROP: Filial, Evento, Fornecedor, Depósito, Ingrediente, Produto, Combo, Venda
 PROP	 			= 0.2
 
 PROP_N_N			= 0.2
 
 PROP_CLIENTE		= 0.3
-PROP_FUNCIONARIO	= 0.3
+PROP_FUNCIONARIO	= 0.2
 PROP_GERENTE		= 0.1
 
 NUM_OUTROS 		= int(NUM_INSERTS * PROP)
@@ -32,8 +32,9 @@ def gen_boolean():
 	return random.randint(0, 1)
 
 def gen_foreing_key(type):
-	if(type == 'deposito'		or 	type == 'filial'	or 	type == 'fornecedor'	or
-		type == 'ingrediente'	or 	type == 'produto' ):
+	if( type == 'deposito'		or 	type == 'filial'	or 	type == 'fornecedor'	or
+		type == 'ingrediente'	or 	type == 'produto'	or 	type == 'combo' 		or
+		type == 'venda'):
 		return random.randint(1, NUM_OUTROS)
 	elif(type == 'cliente'):
 		return random.randint(1, NUM_CLIENTE)
@@ -176,8 +177,11 @@ def try_insert(sql, values):
 	try:
 		cursor.execute(sql, values)
 		conn.commit()
+
+		return True
+
 	except:
-		pass
+		return False
 
 
 conn = mysql.connector.connect(
@@ -203,240 +207,331 @@ with open('lanchonete_script.sql', 'r') as file:
 		cursor.execute(line)
 		conn.commit()
 
-sql = "SET FOREIGN_KEY_CHECKS=0"
-cursor.execute(sql)
-conn.commit()
+with open('carga_dados.sql', 'w') as file:
 
-for i in range(NUM_INSERTS):
-	rua 	= gen_street()
-	numero 	= gen_number()
-	cidade 	= gen_city()
-	cep 	= gen_cep()
+	sql = "SET FOREIGN_KEY_CHECKS=0"
+	cursor.execute(sql)
+	conn.commit()
 
-	if(i < NUM_OUTROS):
+	file.write(sql + ";\n")
 
-		#-----------------------------------FILIAL---------------------------------------
+	for i in range(NUM_INSERTS):
+		rua 	= gen_street()
+		numero 	= gen_number()
+		cidade 	= gen_city()
+		cep 	= gen_cep()
 
-		nome = gen_letters_uppercase()
+		if(i < NUM_OUTROS):
 
-		sql 	= "INSERT INTO filial (nome, rua, numero, cidade, cep) VALUES (%s, %s, %s, %s, %s)"
-		values 	= (nome, rua, numero, cidade, cep)
+			#-----------------------------------FILIAL---------------------------------------
 
-		try_insert(sql, values)
+			nome = gen_letters_uppercase()
 
-		#-----------------------------------EVENTO---------------------------------------
+			sql 	= "INSERT INTO filial (nome, rua, numero, cidade, cep) VALUES (%s, %s, %s, %s, %s)"
+			values 	= (nome, rua, numero, cidade, cep)
 
-		data = gen_date()
-		duracao = gen_duration()
-		preco = gen_value(integer=4)
-		id_filial = gen_foreing_key('filial')
-		id_cliente = gen_foreing_key('cliente')
-
-		sql 	= "INSERT INTO evento (data, duracao, preco, id_filial, id_cliente) VALUES (%s, %s, %s, %s, %s)"
-		values 	= (data, duracao, preco, id_filial, id_cliente)
-
-		try_insert(sql, values)
-
-		id_evento = cursor.lastrowid
-
-		#----------------------------------CONVIDADO-------------------------------------
-
-		for aux in range(NUM_CONVIDADO):
-			nome = gen_name()+' '+gen_letters_uppercase()+'.'+' '+gen_letters_uppercase()+'.'
-
-			sql 	= "INSERT INTO convidado (nome, id_evento) VALUES (%s, %s)"
-			values 	= (nome, id_evento)
-
-			try_insert(sql, values)
-
-		#----------------------------------FORNECEDOR------------------------------------
-
-		razao_social 	= gen_name()
-		cnpj 			= gen_cnpj()
-
-		rua 			= gen_street()
-		numero 			= gen_number()
-		cidade 			= gen_city()
-		cep 			= gen_cep()
-
-		sql 	= "INSERT INTO fornecedor (razao_social, cnpj, rua, numero, cidade, cep) VALUES (%s, %s, %s, %s, %s, %s)"
-		values 	= (razao_social, cnpj, rua, numero, cidade, cep)
-
-		try_insert(sql, values)
-
-		#----------------------------------DEPOSITO-------------------------------------
-
-		rua 			= gen_street()
-		numero 			= gen_number()
-		cidade 			= gen_city()
-		cep 			= gen_cep()
-
-		sql 	= "INSERT INTO deposito (rua, numero, cidade, cep) VALUES (%s, %s, %s, %s)"
-		values 	= (rua, numero, cidade, cep)
-
-		try_insert(sql, values)
-
-		#--------------------------------INGREDIENTE-----------------------------------
-
-		nome 			= gen_letters_uppercase()
-		preco_unitario	= gen_value(integer=1)
-
-		sql 	= "INSERT INTO ingrediente (nome, preco_unitario) VALUES (%s, %s)"
-		values 	= (nome, preco_unitario)
-
-		try_insert(sql, values)
-
-		#----------------------------------PRODUTO-------------------------------------
-
-		nome	= gen_letters_uppercase()
-		preco	= gen_value(integer=2)
-
-		sql 	= "INSERT INTO produto (nome, preco) VALUES (%s, %s)"
-		values 	= (nome, preco)
-
-		try_insert(sql, values)
-
-		#-----------------------------------COMBO--------------------------------------
-
-		nome	= gen_letters_uppercase()
-		preco	= gen_value(integer=2)
-
-		sql 	= "INSERT INTO combo (nome, preco) VALUES (%s, %s)"
-		values 	= (nome, preco)
-
-		try_insert(sql, values)
+			if(try_insert(sql, values)):
+				file.write("INSERT INTO filial (nome, rua, numero, cidade, cep) VALUES " + str(values) + ";\n")
 
 
+			#-----------------------------------EVENTO---------------------------------------
+
+			data = gen_date()
+			duracao = gen_duration()
+			preco = gen_value(integer=4)
+			id_filial = gen_foreing_key('filial')
+			id_cliente = gen_foreing_key('cliente')
+
+			sql 	= "INSERT INTO evento (data, duracao, preco, id_filial, id_cliente) VALUES (%s, %s, %s, %s, %s)"
+			values 	= (data, duracao, preco, id_filial, id_cliente)
+
+			if(try_insert(sql, values)):
+				file.write("INSERT INTO evento (data, duracao, preco, id_filial, id_cliente) VALUES " + str(values) + ";\n")
+
+			id_evento = cursor.lastrowid
+
+			#----------------------------------CONVIDADO-------------------------------------
+
+			for aux in range(NUM_CONVIDADO):
+				nome = gen_name()+' '+gen_letters_uppercase()+'.'+' '+gen_letters_uppercase()+'.'
+
+				sql 	= "INSERT INTO convidado (nome, id_evento) VALUES (%s, %s)"
+				values 	= (nome, id_evento)
+
+				if(try_insert(sql, values)):
+					file.write("INSERT INTO convidado (nome, id_evento) VALUES " + str(values) + ";\n")
+
+			#----------------------------------FORNECEDOR------------------------------------
+
+			razao_social 	= gen_name()
+			cnpj 			= gen_cnpj()
+
+			rua 			= gen_street()
+			numero 			= gen_number()
+			cidade 			= gen_city()
+			cep 			= gen_cep()
+
+			sql 	= "INSERT INTO fornecedor (razao_social, cnpj, rua, numero, cidade, cep) VALUES (%s, %s, %s, %s, %s, %s)"
+			values 	= (razao_social, cnpj, rua, numero, cidade, cep)
+
+			if(try_insert(sql, values)):
+				file.write("INSERT INTO fornecedor (razao_social, cnpj, rua, numero, cidade, cep) VALUES " + str(values) + ";\n")
+
+			#----------------------------------DEPOSITO-------------------------------------
+
+			rua 			= gen_street()
+			numero 			= gen_number()
+			cidade 			= gen_city()
+			cep 			= gen_cep()
+
+			sql 	= "INSERT INTO deposito (rua, numero, cidade, cep) VALUES (%s, %s, %s, %s)"
+			values 	= (rua, numero, cidade, cep)
+
+			if(try_insert(sql, values)):
+				file.write("INSERT INTO deposito (rua, numero, cidade, cep) VALUES " + str(values) + ";\n")
+
+			#--------------------------------INGREDIENTE-----------------------------------
+
+			nome 			= gen_letters_uppercase()
+			preco_unitario	= gen_value(integer=1)
+
+			sql 	= "INSERT INTO ingrediente (nome, preco_unitario) VALUES (%s, %s)"
+			values 	= (nome, preco_unitario)
+
+			if(try_insert(sql, values)):
+				file.write("INSERT INTO ingrediente (nome, preco_unitario) VALUES " + str(values) + ";\n")
+
+			#----------------------------------PRODUTO-------------------------------------
+
+			nome	= gen_letters_uppercase()
+			preco	= gen_value(integer=2)
+
+			sql 	= "INSERT INTO produto (nome, preco) VALUES (%s, %s)"
+			values 	= (nome, preco)
+
+			if(try_insert(sql, values)):
+				file.write("INSERT INTO produto (nome, preco) VALUES " + str(values) + ";\n")
+
+			#-----------------------------------COMBO--------------------------------------
+
+			nome	= gen_letters_uppercase()
+			preco	= gen_value(integer=2)
+
+			sql 	= "INSERT INTO combo (nome, preco) VALUES (%s, %s)"
+			values 	= (nome, preco)
+
+			if(try_insert(sql, values)):
+				file.write("INSERT INTO combo (nome, preco) VALUES " + str(values) + ";\n")
+
+			#-----------------------------------VENDA--------------------------------------
+
+			data			= gen_date()
+			nota_fiscal		= gen_number(size=11)
+			id_cliente		= gen_foreing_key('cliente')
+			id_funcionario 	= gen_foreing_key('funcionario')
+
+			sql 	= "INSERT INTO venda (data, nota_fiscal, id_cliente, id_funcionario) VALUES (%s, %s, %s, %s)"
+			values 	= (data, nota_fiscal, id_cliente, id_funcionario)
+
+			if(try_insert(sql, values)):
+				file.write("INSERT INTO venda (data, nota_fiscal, id_cliente, id_funcionario) VALUES " + str(values) + ";\n")
+
+			#----------------------------------ENTREGA-------------------------------------
+
+			rua 				= gen_street()
+			cep 				= gen_cep()
+			numero 				= gen_number()
+			cidade 				= gen_city()
+			frete				= gen_value(integer=1)
+			nome_destinatario	= gen_name()
+			id_venda 			= gen_foreing_key('venda')
+
+			sql 	= "INSERT INTO entrega (rua, cep, numero, cidade, frete, nome_destinatario, id_venda) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+			values 	= (rua, cep, numero, cidade, frete, nome_destinatario, id_venda)
+
+			if(try_insert(sql, values)):
+				file.write("INSERT INTO entrega (rua, cep, numero, cidade, frete, nome_destinatario, id_venda) VALUES " + str(values) + ";\n")
 
 
-	elif(i < NUM_OUTROS + NUM_CLIENTE + NUM_FUNCIONARIO + NUM_GERENTE):
 
-		#-----------------------------------PESSOA--------------------------------------
 
-		nome 		= gen_name()
-		email 		= gen_email()
-		telefone 	= gen_phone()
-		cpf 		= gen_cpf()
+		elif(i < NUM_OUTROS + NUM_CLIENTE + NUM_FUNCIONARIO + NUM_GERENTE):
 
-		sql 	= "INSERT INTO pessoa (nome, email, telefone, cpf, rua, numero, cidade, cep) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
-		values 	= (nome, email, telefone, cpf, rua, numero, cidade, cep)
+			#-----------------------------------PESSOA--------------------------------------
 
-		try_insert(sql, values)
+			nome 		= gen_name()
+			email 		= gen_email()
+			telefone 	= gen_phone()
+			cpf 		= gen_cpf()
 
-		id_pessoa = cursor.lastrowid
+			sql 	= "INSERT INTO pessoa (nome, email, telefone, cpf, rua, numero, cidade, cep) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+			values 	= (nome, email, telefone, cpf, rua, numero, cidade, cep)
 
-		if(i < NUM_OUTROS + NUM_CLIENTE):
+			if(try_insert(sql, values)):
+				file.write("INSERT INTO pessoa (nome, email, telefone, cpf, rua, numero, cidade, cep) VALUES " + str(values) + ";\n")
 
-			#--------------------------------CLIENTE-----------------------------------
+			id_pessoa = cursor.lastrowid
 
-			credito_disponivel = gen_credit()
+			if(i < NUM_OUTROS + NUM_CLIENTE):
 
-			sql 	= "INSERT INTO cliente (credito_disponivel, id_pessoa) VALUES (%s, %s)"
-			values 	= (credito_disponivel, id_pessoa)
+				#--------------------------------CLIENTE-----------------------------------
 
-			try_insert(sql, values)
+				credito_disponivel = gen_credit()
 
-		else:
+				sql 	= "INSERT INTO cliente (credito_disponivel, id_pessoa) VALUES (%s, %s)"
+				values 	= (credito_disponivel, id_pessoa)
 
-			#------------------------------FUNCIONARIO---------------------------------
+				if(try_insert(sql, values)):
+					file.write("INSERT INTO cliente (credito_disponivel, id_pessoa) VALUES " + str(values) + ";\n")
 
-			cargo		= gen_job()
-			salario		= gen_value(integer=4)
-			login		= gen_letters_lowercase()
-			senha		= gen_letters_lowercase()
-			status		= gen_boolean()
+			else:
+
+				#------------------------------FUNCIONARIO---------------------------------
+
+				cargo		= gen_job()
+				salario		= gen_value(integer=4)
+				login		= gen_letters_lowercase()
+				senha		= gen_letters_lowercase()
+				status		= gen_boolean()
+				id_filial	= gen_foreing_key('filial')
+
+				sql 	= "INSERT INTO funcionario (cargo, salario, login, senha, status, id_filial, id_pessoa) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+				values 	= (cargo, salario, login, senha, status, id_filial, id_pessoa)
+
+				if(try_insert(sql, values)):
+					file.write("INSERT INTO funcionario (cargo, salario, login, senha, status, id_filial, id_pessoa) VALUES " + str(values) + ";\n")
+
+				#--------------------------------GERENTE-----------------------------------
+
+				aux_1 = NUM_OUTROS + NUM_CLIENTE + NUM_FUNCIONARIO
+				aux_2 = NUM_OUTROS + NUM_CLIENTE + NUM_FUNCIONARIO + NUM_GERENTE
+
+				if(aux_1 <= i and i < aux_2):
+					turno 	= gen_shift()
+					grau 	= gen_gerencia()
+
+					sql 	= "INSERT INTO gerente (turno, grau, id_pessoa) VALUES (%s, %s, %s)"
+					values 	= (turno, grau, id_pessoa)
+
+					if(try_insert(sql, values)):
+						file.write("INSERT INTO gerente (turno, grau, id_pessoa) VALUES " + str(values) + ";\n")
+
+
+					
+
+		if(i < NUM_N_N):
+
+			#------------------------------DEPOSITO-FILIAL---------------------------------
+
 			id_filial	= gen_foreing_key('filial')
+			id_deposito	= gen_foreing_key('deposito')
 
-			sql 	= "INSERT INTO funcionario (cargo, salario, login, senha, status, id_filial, id_pessoa) VALUES (%s, %s, %s, %s, %s, %s, %s)"
-			values 	= (cargo, salario, login, senha, status, id_filial, id_pessoa)
+			sql 	= "INSERT INTO deposito_filial (id_filial, id_deposito) VALUES (%s, %s)"
+			values 	= (id_filial, id_deposito)
 
-			try_insert(sql, values)
-
-			#--------------------------------GERENTE-----------------------------------
-
-			aux_1 = NUM_OUTROS + NUM_CLIENTE + NUM_FUNCIONARIO
-			aux_2 = NUM_OUTROS + NUM_CLIENTE + NUM_FUNCIONARIO + NUM_GERENTE
-
-			if(aux_1 <= i and i < aux_2):
-				turno 	= gen_shift()
-				grau 	= gen_gerencia()
-
-				sql 	= "INSERT INTO gerente (turno, grau, id_pessoa) VALUES (%s, %s, %s)"
-				values 	= (turno, grau, id_pessoa)
-
-				try_insert(sql, values)
+			if(try_insert(sql, values)):
+				file.write("INSERT INTO deposito_filial (id_filial, id_deposito) VALUES " + str(values) + ";\n")
 
 
-				
+			#-------------------------ITEM-IGREDIENTE-DEPOSITO-----------------------------
 
-	if(i < NUM_N_N):
+			id_deposito		= gen_foreing_key('deposito')
+			id_ingrediente	= gen_foreing_key('ingrediente')
 
-		#------------------------------DEPOSITO-FILIAL---------------------------------
+			sql 	= "INSERT INTO item_ingrediente_deposito (id_deposito, id_ingrediente) VALUES (%s, %s)"
+			values 	= (id_deposito, id_ingrediente)
 
-		id_filial	= gen_foreing_key('filial')
-		id_deposito	= gen_foreing_key('deposito')
+			if(try_insert(sql, values)):
+				file.write("INSERT INTO item_ingrediente_deposito (id_deposito, id_ingrediente) VALUES " + str(values) + ";\n")
 
-		sql 	= "INSERT INTO deposito_filial (id_filial, id_deposito) VALUES (%s, %s)"
-		values 	= (id_filial, id_deposito)
+			#------------------------ITEM-IGREDIENTE-FORNECEDOR----------------------------
 
-		try_insert(sql, values)
+			id_fornecedor	= gen_foreing_key('fornecedor')
+			id_ingrediente	= gen_foreing_key('ingrediente')
+
+			sql 	= "INSERT INTO item_ingrediente_fornecedor (id_fornecedor, id_ingrediente) VALUES (%s, %s)"
+			values 	= (id_fornecedor, id_ingrediente)
+
+			if(try_insert(sql, values)):
+				file.write("INSERT INTO item_ingrediente_fornecedor (id_fornecedor, id_ingrediente) VALUES " + str(values) + ";\n")
+
+			#---------------------------ITEM-PRODUTO-DEPOSITO------------------------------
+
+			id_produto	= gen_foreing_key('produto')
+			id_deposito		= gen_foreing_key('deposito')
+
+			sql 	= "INSERT INTO item_produto_deposito (id_produto, id_deposito) VALUES (%s, %s)"
+			values 	= (id_produto, id_deposito)
+
+			if(try_insert(sql, values)):
+				file.write("INSERT INTO item_produto_deposito (id_produto, id_deposito) VALUES " + str(values) + ";\n")
+
+			#-------------------------ITEM-INGREDIENTE-PRODUTO-----------------------------
+
+			quantidade  	= gen_number(size=2)
+			id_ingrediente	= gen_foreing_key('ingrediente')
+			id_produto		= gen_foreing_key('produto')
+
+			sql 	= "INSERT INTO item_ingrediente_produto (quantidade, id_ingrediente, id_produto) VALUES (%s, %s, %s)"
+			values 	= (quantidade, id_ingrediente, id_produto)
+
+			if(try_insert(sql, values)):
+				file.write("INSERT INTO item_ingrediente_produto (quantidade, id_ingrediente, id_produto) VALUES " + str(values) + ";\n")
+
+			#-------------------------ITEM-PRODUTO-FORNECEDOR-----------------------------
+
+			id_produto		= gen_foreing_key('produto')
+			id_fornecedor	= gen_foreing_key('fornecedor')
+
+			sql 	= "INSERT INTO item_produto_fornecedor (id_produto, id_fornecedor) VALUES (%s, %s)"
+			values 	= (id_produto, id_fornecedor)
+
+			if(try_insert(sql, values)):
+				file.write("INSERT INTO item_produto_fornecedor (id_produto, id_fornecedor) VALUES " + str(values) + ";\n")
+
+			#---------------------------ITEM-PRODUTO-COMBO-------------------------------
+
+			id_produto	= gen_foreing_key('produto')
+			id_combo	= gen_foreing_key('combo')
+
+			sql 	= "INSERT INTO item_produto_combo (id_produto, id_combo) VALUES (%s, %s)"
+			values 	= (id_produto, id_combo)
+
+			if(try_insert(sql, values)):
+				file.write("INSERT INTO item_produto_combo (id_produto, id_combo) VALUES " + str(values) + ";\n")
+
+			#---------------------------ITEM-PRODUTO-VENDA-------------------------------
+
+			preco_unitario	= gen_value(integer=2)
+			quantidade		= gen_number(size=1)
+			id_produto 		= gen_foreing_key('produto')
+			id_venda		= gen_foreing_key('venda')
+
+			sql 	= "INSERT INTO item_produto_venda (preco_unitario, quantidade, id_produto, id_venda) VALUES (%s, %s, %s, %s)"
+			values 	= (preco_unitario, quantidade, id_produto, id_venda)
+
+			if(try_insert(sql, values)):
+				file.write("INSERT INTO item_produto_venda (preco_unitario, quantidade, id_produto, id_venda) VALUES " + str(values) + ";\n")
+
+			#----------------------------ITEM-COMBO-VENDA-------------------------------
+
+			preco_unitario	= gen_value(integer=2)
+			quantidade		= gen_number(size=1)
+			id_combo 		= gen_foreing_key('combo')
+			id_venda		= gen_foreing_key('venda')
+
+			sql 	= "INSERT INTO item_combo_venda (preco_unitario, quantidade, id_combo, id_venda) VALUES (%s, %s, %s, %s)"
+			values 	= (preco_unitario, quantidade, id_combo, id_venda)
+
+			if(try_insert(sql, values)):
+				file.write("INSERT INTO item_combo_venda (preco_unitario, quantidade, id_combo, id_venda) VALUES " + str(values) + ";\n")
 
 
-		#-------------------------ITEM-IGREDIENTE-DEPOSITO-----------------------------
+	sql = "SET FOREIGN_KEY_CHECKS=1"
+	cursor.execute(sql)
+	conn.commit()
 
-		id_deposito		= gen_foreing_key('deposito')
-		id_ingrediente	= gen_foreing_key('ingrediente')
-
-		sql 	= "INSERT INTO item_ingrediente_deposito (id_deposito, id_ingrediente) VALUES (%s, %s)"
-		values 	= (id_deposito, id_ingrediente)
-
-		try_insert(sql, values)
-
-		#------------------------ITEM-IGREDIENTE-FORNECEDOR----------------------------
-
-		id_fornecedor	= gen_foreing_key('fornecedor')
-		id_ingrediente	= gen_foreing_key('ingrediente')
-
-		sql 	= "INSERT INTO item_ingrediente_fornecedor (id_fornecedor, id_ingrediente) VALUES (%s, %s)"
-		values 	= (id_fornecedor, id_ingrediente)
-
-		try_insert(sql, values)
-
-		#---------------------------ITEM-PRODUTO-DEPOSITO------------------------------
-
-		id_produto	= gen_foreing_key('produto')
-		id_deposito		= gen_foreing_key('deposito')
-
-		sql 	= "INSERT INTO item_produto_deposito (id_produto, id_deposito) VALUES (%s, %s)"
-		values 	= (id_produto, id_deposito)
-
-		try_insert(sql, values)
-
-		#-------------------------ITEM-INGREDIENTE-PRODUTO-----------------------------
-
-		quantidade  	= gen_number(size=2)
-		id_ingrediente	= gen_foreing_key('ingrediente')
-		id_produto		= gen_foreing_key('produto')
-
-		sql 	= "INSERT INTO item_ingrediente_produto (quantidade, id_ingrediente, id_produto) VALUES (%s, %s, %s)"
-		values 	= (quantidade, id_ingrediente, id_produto)
-
-		try_insert(sql, values)
-
-		#-------------------------ITEM-PRODUTO-FORNECEDOR-----------------------------
-
-		id_produto		= gen_foreing_key('produto')
-		id_fornecedor	= gen_foreing_key('fornecedor')
-
-		sql 	= "INSERT INTO item_produto_fornecedor (id_produto, id_fornecedor) VALUES (%s, %s)"
-		values 	= (id_produto, id_fornecedor)
-
-		try_insert(sql, values)
-
-
-sql = "SET FOREIGN_KEY_CHECKS=1"
-cursor.execute(sql)
-conn.commit()
+	file.write(sql + ";\n")
 
 '''
 sql = "SELECT * FROM filial"
