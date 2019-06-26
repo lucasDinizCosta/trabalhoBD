@@ -65,10 +65,10 @@ def gen_phone():
 								rstr.rstr('1234567890', 4))
 
 def gen_number(size=3):
-	return rstr.rstr('1234567890', size)
+	return rstr.rstr('123456789', size)
 
 def gen_value(integer):
-	return '{0}.{1}'.format(rstr.rstr('1234567890', integer),
+	return '{0}.{1}'.format(rstr.rstr('123456789', integer),
 							rstr.rstr('1234567890', 2))
 
 def gen_credit():
@@ -231,7 +231,7 @@ with open('carga_dados.sql', 'w') as file:
 			values 	= (nome, rua, numero, cidade, cep)
 
 			if(try_insert(sql, values)):
-				file.write("INSERT INTO filial (nome, rua, numero, cidade, cep) VALUES " + str(values) + ";\n")
+				file.write("INSERT INTO lanchonete.filial (nome, rua, numero, cidade, cep) VALUES " + str(values) + ";\n")
 
 
 			#-----------------------------------EVENTO---------------------------------------
@@ -246,7 +246,7 @@ with open('carga_dados.sql', 'w') as file:
 			values 	= (data, duracao, preco, id_filial, id_cliente)
 
 			if(try_insert(sql, values)):
-				file.write("INSERT INTO evento (data, duracao, preco, id_filial, id_cliente) VALUES " + str(values) + ";\n")
+				file.write("INSERT INTO lanchonete.evento (data, duracao, preco, id_filial, id_cliente) VALUES " + str(values) + ";\n")
 
 			id_evento = cursor.lastrowid
 
@@ -259,7 +259,7 @@ with open('carga_dados.sql', 'w') as file:
 				values 	= (nome, id_evento)
 
 				if(try_insert(sql, values)):
-					file.write("INSERT INTO convidado (nome, id_evento) VALUES " + str(values) + ";\n")
+					file.write("INSERT INTO lanchonete.convidado (nome, id_evento) VALUES " + str(values) + ";\n")
 
 			#----------------------------------FORNECEDOR------------------------------------
 
@@ -275,7 +275,7 @@ with open('carga_dados.sql', 'w') as file:
 			values 	= (razao_social, cnpj, rua, numero, cidade, cep)
 
 			if(try_insert(sql, values)):
-				file.write("INSERT INTO fornecedor (razao_social, cnpj, rua, numero, cidade, cep) VALUES " + str(values) + ";\n")
+				file.write("INSERT INTO lanchonete.fornecedor (razao_social, cnpj, rua, numero, cidade, cep) VALUES " + str(values) + ";\n")
 
 			#----------------------------------DEPOSITO-------------------------------------
 
@@ -288,7 +288,7 @@ with open('carga_dados.sql', 'w') as file:
 			values 	= (rua, numero, cidade, cep)
 
 			if(try_insert(sql, values)):
-				file.write("INSERT INTO deposito (rua, numero, cidade, cep) VALUES " + str(values) + ";\n")
+				file.write("INSERT INTO lanchonete.deposito (rua, numero, cidade, cep) VALUES " + str(values) + ";\n")
 
 			#--------------------------------INGREDIENTE-----------------------------------
 
@@ -299,7 +299,7 @@ with open('carga_dados.sql', 'w') as file:
 			values 	= (nome, preco_unitario)
 
 			if(try_insert(sql, values)):
-				file.write("INSERT INTO ingrediente (nome, preco_unitario) VALUES " + str(values) + ";\n")
+				file.write("INSERT INTO lanchonete.ingrediente (nome, preco_unitario) VALUES " + str(values) + ";\n")
 
 			#----------------------------------PRODUTO-------------------------------------
 
@@ -310,7 +310,7 @@ with open('carga_dados.sql', 'w') as file:
 			values 	= (nome, preco)
 
 			if(try_insert(sql, values)):
-				file.write("INSERT INTO produto (nome, preco) VALUES " + str(values) + ";\n")
+				file.write("INSERT INTO lanchonete.produto (nome, preco) VALUES " + str(values) + ";\n")
 
 			#-----------------------------------COMBO--------------------------------------
 
@@ -321,7 +321,7 @@ with open('carga_dados.sql', 'w') as file:
 			values 	= (nome, preco)
 
 			if(try_insert(sql, values)):
-				file.write("INSERT INTO combo (nome, preco) VALUES " + str(values) + ";\n")
+				file.write("INSERT INTO lanchonete.combo (nome, preco) VALUES " + str(values) + ";\n")
 
 			#-----------------------------------VENDA--------------------------------------
 
@@ -334,7 +334,7 @@ with open('carga_dados.sql', 'w') as file:
 			values 	= (data, nota_fiscal, id_cliente, id_funcionario)
 
 			if(try_insert(sql, values)):
-				file.write("INSERT INTO venda (data, nota_fiscal, id_cliente, id_funcionario) VALUES " + str(values) + ";\n")
+				file.write("INSERT INTO lanchonete.venda (data, nota_fiscal, id_cliente, id_funcionario) VALUES " + str(values) + ";\n")
 
 			#----------------------------------ENTREGA-------------------------------------
 
@@ -350,7 +350,7 @@ with open('carga_dados.sql', 'w') as file:
 			values 	= (rua, cep, numero, cidade, frete, nome_destinatario, id_venda)
 
 			if(try_insert(sql, values)):
-				file.write("INSERT INTO entrega (rua, cep, numero, cidade, frete, nome_destinatario, id_venda) VALUES " + str(values) + ";\n")
+				file.write("INSERT INTO lanchonete.entrega (rua, cep, numero, cidade, frete, nome_destinatario, id_venda) VALUES " + str(values) + ";\n")
 
 
 
@@ -368,7 +368,7 @@ with open('carga_dados.sql', 'w') as file:
 			values 	= (nome, email, telefone, cpf, rua, numero, cidade, cep)
 
 			if(try_insert(sql, values)):
-				file.write("INSERT INTO pessoa (nome, email, telefone, cpf, rua, numero, cidade, cep) VALUES " + str(values) + ";\n")
+				file.write("INSERT INTO lanchonete.pessoa (nome, email, telefone, cpf, rua, numero, cidade, cep) VALUES " + str(values) + ";\n")
 
 			id_pessoa = cursor.lastrowid
 
@@ -382,7 +382,7 @@ with open('carga_dados.sql', 'w') as file:
 				values 	= (credito_disponivel, id_pessoa)
 
 				if(try_insert(sql, values)):
-					file.write("INSERT INTO cliente (credito_disponivel, id_pessoa) VALUES " + str(values) + ";\n")
+					file.write("INSERT INTO lanchonete.cliente (credito_disponivel, id_pessoa) VALUES " + str(values) + ";\n")
 
 			else:
 
@@ -399,7 +399,7 @@ with open('carga_dados.sql', 'w') as file:
 				values 	= (cargo, salario, login, senha, status, id_filial, id_pessoa)
 
 				if(try_insert(sql, values)):
-					file.write("INSERT INTO funcionario (cargo, salario, login, senha, status, id_filial, id_pessoa) VALUES " + str(values) + ";\n")
+					file.write("INSERT INTO lanchonete.funcionario (cargo, salario, login, senha, status, id_filial, id_pessoa) VALUES " + str(values) + ";\n")
 
 				#--------------------------------GERENTE-----------------------------------
 
@@ -414,7 +414,7 @@ with open('carga_dados.sql', 'w') as file:
 					values 	= (turno, grau, id_pessoa)
 
 					if(try_insert(sql, values)):
-						file.write("INSERT INTO gerente (turno, grau, id_pessoa) VALUES " + str(values) + ";\n")
+						file.write("INSERT INTO lanchonete.gerente (turno, grau, id_pessoa) VALUES " + str(values) + ";\n")
 
 
 					
@@ -430,7 +430,7 @@ with open('carga_dados.sql', 'w') as file:
 			values 	= (id_filial, id_deposito)
 
 			if(try_insert(sql, values)):
-				file.write("INSERT INTO deposito_filial (id_filial, id_deposito) VALUES " + str(values) + ";\n")
+				file.write("INSERT INTO lanchonete.deposito_filial (id_filial, id_deposito) VALUES " + str(values) + ";\n")
 
 
 			#-------------------------ITEM-IGREDIENTE-DEPOSITO-----------------------------
@@ -442,7 +442,7 @@ with open('carga_dados.sql', 'w') as file:
 			values 	= (id_deposito, id_ingrediente)
 
 			if(try_insert(sql, values)):
-				file.write("INSERT INTO item_ingrediente_deposito (id_deposito, id_ingrediente) VALUES " + str(values) + ";\n")
+				file.write("INSERT INTO lanchonete.item_ingrediente_deposito (id_deposito, id_ingrediente) VALUES " + str(values) + ";\n")
 
 			#------------------------ITEM-IGREDIENTE-FORNECEDOR----------------------------
 
@@ -453,7 +453,7 @@ with open('carga_dados.sql', 'w') as file:
 			values 	= (id_fornecedor, id_ingrediente)
 
 			if(try_insert(sql, values)):
-				file.write("INSERT INTO item_ingrediente_fornecedor (id_fornecedor, id_ingrediente) VALUES " + str(values) + ";\n")
+				file.write("INSERT INTO lanchonete.item_ingrediente_fornecedor (id_fornecedor, id_ingrediente) VALUES " + str(values) + ";\n")
 
 			#---------------------------ITEM-PRODUTO-DEPOSITO------------------------------
 
@@ -464,11 +464,11 @@ with open('carga_dados.sql', 'w') as file:
 			values 	= (id_produto, id_deposito)
 
 			if(try_insert(sql, values)):
-				file.write("INSERT INTO item_produto_deposito (id_produto, id_deposito) VALUES " + str(values) + ";\n")
+				file.write("INSERT INTO lanchonete.item_produto_deposito (id_produto, id_deposito) VALUES " + str(values) + ";\n")
 
 			#-------------------------ITEM-INGREDIENTE-PRODUTO-----------------------------
 
-			quantidade  	= gen_number(size=2)
+			quantidade  	= gen_number(size=1)
 			id_ingrediente	= gen_foreing_key('ingrediente')
 			id_produto		= gen_foreing_key('produto')
 
@@ -476,7 +476,7 @@ with open('carga_dados.sql', 'w') as file:
 			values 	= (quantidade, id_ingrediente, id_produto)
 
 			if(try_insert(sql, values)):
-				file.write("INSERT INTO item_ingrediente_produto (quantidade, id_ingrediente, id_produto) VALUES " + str(values) + ";\n")
+				file.write("INSERT INTO lanchonete.item_ingrediente_produto (quantidade, id_ingrediente, id_produto) VALUES " + str(values) + ";\n")
 
 			#-------------------------ITEM-PRODUTO-FORNECEDOR-----------------------------
 
@@ -487,18 +487,19 @@ with open('carga_dados.sql', 'w') as file:
 			values 	= (id_produto, id_fornecedor)
 
 			if(try_insert(sql, values)):
-				file.write("INSERT INTO item_produto_fornecedor (id_produto, id_fornecedor) VALUES " + str(values) + ";\n")
+				file.write("INSERT INTO lanchonete.item_produto_fornecedor (id_produto, id_fornecedor) VALUES " + str(values) + ";\n")
 
 			#---------------------------ITEM-PRODUTO-COMBO-------------------------------
 
+			quantidade		= gen_number(size=1)
 			id_produto	= gen_foreing_key('produto')
 			id_combo	= gen_foreing_key('combo')
 
-			sql 	= "INSERT INTO item_produto_combo (id_produto, id_combo) VALUES (%s, %s)"
-			values 	= (id_produto, id_combo)
+			sql 	= "INSERT INTO item_produto_combo (quantidade, id_produto, id_combo) VALUES (%s, %s, %s)"
+			values 	= (quantidade, id_produto, id_combo)
 
 			if(try_insert(sql, values)):
-				file.write("INSERT INTO item_produto_combo (id_produto, id_combo) VALUES " + str(values) + ";\n")
+				file.write("INSERT INTO lanchonete.item_produto_combo (quantidade, id_produto, id_combo) VALUES " + str(values) + ";\n")
 
 			#---------------------------ITEM-PRODUTO-VENDA-------------------------------
 
@@ -511,7 +512,7 @@ with open('carga_dados.sql', 'w') as file:
 			values 	= (preco_unitario, quantidade, id_produto, id_venda)
 
 			if(try_insert(sql, values)):
-				file.write("INSERT INTO item_produto_venda (preco_unitario, quantidade, id_produto, id_venda) VALUES " + str(values) + ";\n")
+				file.write("INSERT INTO lanchonete.item_produto_venda (preco_unitario, quantidade, id_produto, id_venda) VALUES " + str(values) + ";\n")
 
 			#----------------------------ITEM-COMBO-VENDA-------------------------------
 
@@ -524,7 +525,7 @@ with open('carga_dados.sql', 'w') as file:
 			values 	= (preco_unitario, quantidade, id_combo, id_venda)
 
 			if(try_insert(sql, values)):
-				file.write("INSERT INTO item_combo_venda (preco_unitario, quantidade, id_combo, id_venda) VALUES " + str(values) + ";\n")
+				file.write("INSERT INTO lanchonete.item_combo_venda (preco_unitario, quantidade, id_combo, id_venda) VALUES " + str(values) + ";\n")
 
 
 	sql = "SET FOREIGN_KEY_CHECKS=1"
